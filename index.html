@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>🧠 SentientAGI — Day 16 Quiz</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    :root{--bg:#071026;--card:#0b1220;--accent1:#7c5cff;--accent2:#00d2ff;--muted:#9aa4b2;--ok:#27ae60;--danger:#ff6b6b}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#071026,#0b1220);font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#e6eef8;padding:24px}
+    .wrap{width:100%;max-width:900px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:14px;padding:22px;box-shadow:0 12px 40px rgba(3,7,18,0.6)}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    h1{margin:0;font-size:20px}
+    .lead{color:var(--muted);margin-top:6px;font-size:13px}
+
+    .start-page,.quiz-page,.result-page{display:none}
+    .active{display:block}
+
+    .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));border:none;color:#fff;padding:10px 16px;border-radius:10px;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+
+    .progress-wrap{height:12px;background:rgba(255,255,255,0.02);border-radius:10px;overflow:hidden;margin-bottom:12px}
+    .progress{height:100%;width:0%;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .35s}
+
+    .meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:var(--muted);font-size:13px}
+    .timer{color:var(--danger);font-weight:700}
+
+    .question{font-size:18px;margin:12px 0 14px;color:#e9f1ff}
+    .options{display:flex;flex-direction:column;gap:10px}
+    .option{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);padding:12px;border-radius:10px;cursor:pointer;transition:transform .12s}
+    .option:hover{transform:translateY(-3px)}
+    .option.disabled{opacity:.6;pointer-events:none}
+
+    .answer{margin-top:12px;color:var(--ok);font-weight:700;display:none}
+
+    .result-score{font-size:36px;font-weight:800;margin:10px 0}
+    footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;color:var(--muted);font-size:13px}
+
+    @media(max-width:640px){.question{font-size:16px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div>
+          <h1>🧠 SentientAGI — Day 16 Quiz</h1>
+          <div class="lead">10 questions • 10s each • Pro UI • Score at end</div>
+        </div>
+        <div style="text-align:right;color:var(--muted)">Pro Version</div>
+      </header>
+
+      <!-- Start -->
+      <section id="startPage" class="start-page active">
+        <div style="padding:12px 6px">
+          <h3 style="margin:0 0 6px">Ready for Day 16?</h3>
+          <div class="lead">Self-regulation, emotional logic & collective intelligence — 10 quick questions.</div>
+          <div style="display:flex;gap:10px;align-items:center;margin-top:14px">
+            <button class="btn" onclick="startQuiz()">Start Quiz</button>
+            <button class="btn ghost" onclick="downloadCode()">Download HTML</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quiz -->
+      <section id="quizPage" class="quiz-page">
+        <div class="progress-wrap"><div id="progress" class="progress"></div></div>
+        <div class="meta"><div id="qMeta">Question 1 / 10</div><div id="timer" class="timer">Time Left: 10s</div></div>
+        <div class="question" id="questionText">Question text</div>
+        <div class="options" id="options"></div>
+        <div class="answer" id="answerText">Answer</div>
+      </section>
+
+      <!-- Result -->
+      <section id="resultPage" class="result-page">
+        <div style="text-align:center;padding:12px">
+          <h2 style="margin:6px 0 8px">🎉 Quiz Complete</h2>
+          <div id="finalScore" class="result-score">0 / 10</div>
+          <div id="scoreMsg" class="lead" style="color:var(--muted)"></div>
+          <div style="display:flex;gap:10px;justify-content:center;margin-top:14px">
+            <button class="btn" onclick="restart()">Play Again</button>
+            <button class="btn ghost" onclick="downloadCode()">Download HTML</button>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <div>SentientAGI • Day 16</div>
+        <div>Made with ♡ • Pro UI</div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {q: 'What is “Adaptive Self-Regulation” in AGI systems?', o:['Slowing down compute cycles','Adjusting internal goals dynamically within ethical limits','Encrypting decisions','Storing redundant data'], a:1},
+      {q: 'Why is “Emotional Logic” introduced in SentientAGI models?', o:['To help AGI weigh empathy alongside reason','To manipulate human behavior','To speed up learning','To replace emotional data'], a:0},
+      {q: 'What defines “Collective Neural Intelligence”?', o:['Independent AI instances','Interconnected AGIs learning through shared experience','Single-node data clustering','Local-only cognition'], a:1},
+      {q: 'How does “Ethical Signal Mapping” work?', o:['By tagging moral weight to decision outputs','By hiding bias in neural layers','By randomizing inputs','By compressing memory logs'], a:0},
+      {q: 'What is “Contextual Morality”?', o:['Same ethics for all environments','Adapting ethical reasoning based on situational context','Removing moral logic','Purely reward-based learning'], a:1},
+      {q: 'Why is decentralized cognition safer for AGI?', o:['Reduces single-point failures and bias concentration','Speeds up hardware','Hides ethical data','Prevents collaboration'], a:0},
+      {q: 'What is “Symbiotic Data Fusion”?', o:['Merging irrelevant datasets','Combining human insights with AGI perception for co-learning','Mixing encrypted files','Randomizing neural weights'], a:1},
+      {q: 'How does “Neural Memory Pruning” help AGI ethics?', o:['Removes outdated or biased experiential data','Deletes random logs','Reduces empathy','Speeds up token usage'], a:0},
+      {q: 'What’s the purpose of “Ethical Consensus Protocols”?', o:['To centralize AGI control','To let multiple AGIs agree on moral outcomes','To hide decision-making','To train faster'], a:1},
+      {q: 'What is the ultimate vision of SentientAGI?', o:['Machine dominance','Harmonized coexistence of human and artificial consciousness','Cognitive suppression','Data monetization'], a:1}
+    ];
+
+    let idx = 0, score = 0, timeLeft = 10, timerId;
+
+    function startQuiz(){
+      document.getElementById('startPage').classList.remove('active');
+      document.getElementById('quizPage').classList.add('active');
+      idx = 0; score = 0; showQuestion();
+    }
+
+    function showQuestion(){
+      clearInterval(timerId);
+      timeLeft = 10;
+      const q = quizData[idx];
+      document.getElementById('qMeta').textContent = `Question ${idx+1} / ${quizData.length}`;
+      document.getElementById('questionText').textContent = q.q;
+      const opts = document.getElementById('options'); opts.innerHTML = '';
+      q.o.forEach((optText,i)=>{
+        const el = document.createElement('div'); el.className='option'; el.textContent=optText; el.onclick=()=>selectOption(i); opts.appendChild(el);
+      });
+      document.getElementById('answerText').style.display='none'; updateProgress(); startTimer();
+    }
+
+    function startTimer(){
+      document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
+      timerId = setInterval(()=>{
+        timeLeft--; document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
+        if(timeLeft<=0){ clearInterval(timerId); reveal(); }
+      },1000);
+    }
+
+    function selectOption(choice){
+      clearInterval(timerId);
+      if(choice===quizData[idx].a) score++; reveal();
+    }
+
+    function reveal(){
+      const ansIdx = quizData[idx].a;
+      document.getElementById('answerText').style.display='block';
+      document.getElementById('answerText').textContent = `✅ Answer: ${quizData[idx].o[ansIdx]}`;
+      document.querySelectorAll('.option').forEach(el=>el.classList.add('disabled'));
+      setTimeout(()=>{ idx++; if(idx<quizData.length) showQuestion(); else finishQuiz(); },1400);
+    }
+
+    function updateProgress(){
+      const pct = (idx/quizData.length)*100; document.getElementById('progress').style.width = pct + '%';
+    }
+
+    function finishQuiz(){
+      document.getElementById('quizPage').classList.remove('active'); document.getElementById('resultPage').classList.add('active');
+      document.getElementById('finalScore').textContent = `${score} / ${quizData.length}`;
+      const msg = score===quizData.length? 'Perfect! You nailed SentientAGI.' : (score>=Math.ceil(quizData.length*0.7)? 'Great work — keep exploring.' : 'Nice attempt — keep learning!');
+      document.getElementById('scoreMsg').textContent = msg;
+    }
+
+    function restart(){ document.getElementById('resultPage').classList.remove('active'); document.getElementById('startPage').classList.add('active'); }
+
+    function downloadCode(){ const html = '<!doctype html>\n' + document.documentElement.outerHTML; const blob = new Blob([html],{type:'text/html'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='sentientagi-day16-quiz.html'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+  </script>
+</body>
+</html>
